@@ -1,0 +1,150 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // --- Global Helpers ---
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isEmailVerified() {
+      return request.auth.token.email_verified == true;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isAdmin() {
+      return isSignedIn() && isEmailVerified() && (
+        (request.auth.token.email == "allenjohanes08@gmail.com") ||
+        exists(/databases/$(database)/documents/admins/$(request.auth.uid))
+      );
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() { return request.resource.data; }
+    function existing() { return resource.data; }
+
+    // --- Validation Helpers ---
+
+    function isValidUserProfile(data) {
+      return data.uid is string && data.uid.size() <= 128 &&
+             data.email is string && data.email.size() <= 255 &&
+             data.fullName is string && data.fullName.size() <= 100 &&
+             data.phone is string && data.phone.size() <= 50 &&
+             (data.requestedRole is string) &&
+             (data.verifiedRole is string) &&
+             (data.roleVerificationStatus is string) &&
+             data.createdAt is timestamp &&
+             data.updatedAt is timestamp;
+    }
+
+    function isValidNotification(data) {
+      return data.userId is string && isValidId(data.userId) &&
+             data.title is string && data.title.size() <= 100 &&
+             data.message is string && data.message.size() <= 500 &&
+             data.read is bool &&
+             data.createdAt is timestamp;
+    }
+
+    function isValidGiftCardRequest(data) {
+      return data.userId is string && isValidId(data.userId) &&
+             data.amount is number && data.amount > 0 &&
+             data.status in ['PENDING', 'APPROVED', 'REJECTED', 'COMPLETED'] &&
+             data.createdAt is timestamp;
+    }
+
+    function isValidRegistryRequest(data) {
+      return data.userId is string && isValidId(data.userId) &&
+             data.title is string && data.title.size() <= 200 &&
+             data.status in ['PENDING', 'APPROVED', 'REJECTED', 'COMPLETED'] &&
+             data.createdAt is timestamp;
+    }
+    
+    function isValidEventInvitation(data) {
+      return data.eventId is number &&
+             data.invitationCode is string && data.invitationCode.size() <= 64 &&
+             data.verificationToken is string && data.verificationToken.size() <= 128 &&
+             data.invitedUserName is string && data.invitedUserName.size() <= 100 &&
+             data.status in ['PENDING', 'ACCEPTED', 'DECLINED', 'REVOKED'] &&
+             data.arrivalStatus in ['PENDING', 'ARRIVED'] &&
+             data.createdAt is timestamp;
+    }
+
+    // --- Match Rules ---
+
+    // Default deny all
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    match /users/{userId} {
+      allow get: if isOwner(userId) || isAdmin();
+      allow list: if isAdmin();
+      
+      allow create: if isOwner(userId) && isEmailVerified() &&
+                       isValidUserProfile(incoming()) &&
+                       incoming().uid == userId &&
+                       incoming().verifiedRole == 'CUSTOMER' &&
+                       incoming().roleVerificationStatus == 'PENDING' &&
+                       incoming().createdAt == request.time;
+      
+      allow update: if (isAdmin() || (isOwner(userId) && isEmailVerified())) &&
+                       isValidUserProfile(incoming()) &&
+                       incoming().uid == existing().uid &&
+                       incoming().createdAt == existing().createdAt &&
+                       incoming().updatedAt == request.time &&
+                       (isAdmin() || (
+                         incoming().verifiedRole == existing().verifiedRole &&
+                         incoming().roleVerificationStatus == existing().roleVerificationStatus &&
+                         incoming().diff(existing()).affectedKeys().hasOnly(['fullName', 'phone', 'requestedRole', 'updatedAt'])
+                       ));
+      allow delete: if isAdmin();
+    }
+
+    match /notifications/{notificationId} {
+      allow get, list: if isOwner(resource.data.userId);
+      allow create: if false; // System only
+      allow update: if isOwner(resource.data.userId) && 
+                      incoming().diff(existing()).affectedKeys().hasOnly(['read']) &&
+                      isValidNotification(incoming());
+      allow delete: if isOwner(resource.data.userId);
+    }
+
+    match /giftCardRequests/{requestId} {
+      allow get: if isOwner(resource.data.userId) || isAdmin();
+      allow list: if isSignedIn();
+      allow create: if isOwner(incoming().userId) && isEmailVerified() &&
+                       incoming().status == 'PENDING' &&
+                       isValidGiftCardRequest(incoming()) &&
+                       incoming().createdAt == request.time;
+      allow update: if isAdmin(); // Only admin can update
+      allow delete: if isAdmin();
+    }
+
+    match /registryRequests/{requestId} {
+      allow get: if isOwner(resource.data.userId) || isAdmin();
+      allow list: if isSignedIn();
+      allow create: if isOwner(incoming().userId) && isEmailVerified() &&
+                       incoming().status == 'PENDING' &&
+                       isValidRegistryRequest(incoming()) &&
+                       incoming().createdAt == request.time;
+      allow update: if isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    match /eventInvitations/{invitationId} {
+      allow get, list: if isSignedIn() && (
+        isAdmin() ||
+        resource.data.invitedUserUid == request.auth.uid ||
+        resource.data.userId == request.auth.uid
+      );
+      allow create, update: if false; // server-authoritative only
+      allow delete: if isAdmin();
+    }
+  }
+}

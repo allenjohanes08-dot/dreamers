@@ -1,0 +1,270 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primary: #3b82f6; /* blue-500 */
+  --color-primary-hover: #2563eb; /* blue-600 */
+  --color-primary-active: #1d4ed8; /* blue-700 */
+  --color-primary-light: #1e3a8a; /* blue-900 */
+
+  --color-amazon-orange: #ff9900;
+  --color-amazon-orange-hover: #f3a847;
+  --color-amazon-gold: #febd69;
+  --color-amazon-yellow: #ffd814;
+  --color-amazon-navy: #232f3e;
+  --color-amazon-charcoal: #131921;
+  
+  --color-surface: rgba(15, 23, 42, 0.85);
+  --color-surface-secondary: rgba(30, 41, 59, 0.75);
+  
+  --color-light-green: #ffffff;
+  --color-light-green-border: rgba(255, 255, 255, 0.2);
+  
+  --color-text-primary: #ffffff; /* White */
+  --color-text-secondary: #f3f4f6; /* Gray-100 */
+  --color-text-muted: #ffffff; /* White */
+  
+  --color-border-dim: rgba(255, 255, 255, 0.15);
+  
+  --shadow-soft: 0 4px 6px -1px rgb(0 0 0 / 0.5), 0 2px 4px -2px rgb(0 0 0 / 0.5);
+  --shadow-xl-soft: 0 20px 25px -5px rgb(0 0 0 / 0.7), 0 8px 10px -6px rgb(0 0 0 / 0.7);
+}
+
+:root {
+  --primary: #3b82f6;
+  --primary-hover: #2563eb;
+  --primary-active: #1d4ed8;
+  --primary-light: #1e3a8a;
+
+  --background: #020617;
+  --surface: rgba(15, 23, 42, 0.85);
+  --surface-secondary: rgba(30, 41, 59, 0.75);
+  --light-green: #ffffff;
+  --light-green-border: rgba(255, 255, 255, 0.2);
+
+  --text-primary: #ffffff;
+  --text-secondary: #f3f4f6;
+  --text-muted: #ffffff;
+
+  --border: rgba(255, 255, 255, 0.15);
+
+  --success: #22c55e;
+  --warning: #f59e0b;
+  --error: #ef4444;
+  --info: #3b82f6;
+}
+
+html,
+body {
+  min-height: 100dvh;
+  -webkit-overflow-scrolling: touch;
+}
+
+body {
+  @apply text-light-green antialiased;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  background-color: transparent;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  @apply bg-slate-700/50 rounded-full hover:bg-slate-600 transition-colors;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Responsive Table Wrapper */
+.table-responsive {
+  @apply w-full overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0;
+}
+
+/* Safe Area Insets for Mobile */
+.pb-safe {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.pt-safe {
+  padding-top: env(safe-area-inset-top);
+}
+
+/* Consistent Card Styling */
+.card-glass {
+  @apply bg-slate-900/80 backdrop-blur-md border border-light-green/10 shadow-xl;
+}
+
+/* Custom Checkbox */
+input[type="checkbox"] {
+  @apply accent-blue-600;
+}
+
+/* ==========================================================================
+   GLOBAL FORM FIELD STYLES
+   - Blue background for all editable inputs, selects, textareas
+   - White text and high-contrast placeholder
+   - Clearly visible borders and focus rings
+   ========================================================================== */
+input:not([type="checkbox"]):not([type="radio"]):not([type="submit"]):not([type="button"]):not([type="range"]):not([type="color"]):not([type="file"]):not([type="hidden"]),
+select,
+textarea {
+  background-color: #2563eb;
+  color: #ffffff;
+  border-color: #60a5fa;
+}
+
+input:not([type="checkbox"]):not([type="radio"]):not([type="submit"]):not([type="button"]):not([type="range"]):not([type="color"]):not([type="file"]):not([type="hidden"])::placeholder,
+textarea::placeholder {
+  color: rgba(239, 246, 255, 0.9);
+  opacity: 1;
+}
+
+input:not([type="checkbox"]):not([type="radio"]):not([type="submit"]):not([type="button"]):not([type="range"]):not([type="color"]):not([type="file"]):not([type="hidden"]):focus,
+select:focus,
+textarea:focus {
+  outline: none !important;
+  border-color: #ffffff !important;
+  box-shadow: 0 0 0 3px rgba(147, 197, 253, 0.5) !important;
+}
+
+select option {
+  background-color: #0f172a !important;
+  color: #ffffff !important;
+}
+
+/* Modal Scroll Container */
+.modal-scroll {
+  @apply max-h-[calc(100vh-120px)] overflow-y-auto;
+}
+
+/* Delivery Truck Loading Screen Styles */
+#loader-wrapper {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: #0f172a;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  transition: opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.5s ease;
+}
+
+#loader-wrapper.loader-hidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.animation-container {
+  position: relative;
+  width: 240px;
+  height: 110px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.delivery-truck {
+  width: 120px;
+  height: 80px;
+  z-index: 2;
+  animation: engine-hum 0.22s ease-in-out infinite alternate;
+}
+
+.road-line {
+  width: 180px;
+  height: 4px;
+  background: linear-gradient(90deg, #9ca3af 70%, transparent 70%);
+  background-size: 30px 100%;
+  margin-top: -12px;
+  z-index: 1;
+  animation: highway-move 0.4s linear infinite;
+}
+
+.loading-text {
+  color: #f0fdf4;
+  font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-weight: 900;
+  font-size: 13px;
+  letter-spacing: 3px;
+  margin-top: 24px;
+  text-transform: uppercase;
+}
+
+/* Synchronized Progress Bar */
+.loader-progress-track {
+  width: 220px;
+  height: 6px;
+  background-color: rgba(59, 130, 246, 0.2);
+  border-radius: 9999px;
+  overflow: hidden;
+  margin-top: 16px;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.06);
+}
+
+.loader-progress-fill {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, #2563eb 0%, #4f46e5 50%, #10b981 100%);
+  border-radius: 9999px;
+  transition: width 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 0 12px rgba(37, 99, 235, 0.4);
+}
+
+.loader-status-row {
+  width: 220px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 8px;
+}
+
+.loader-status-detail {
+  font-size: 10px;
+  font-weight: 700;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  max-width: 165px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.loader-progress-percent {
+  font-size: 11px;
+  font-weight: 900;
+  color: #2563eb;
+  font-mono: true;
+}
+
+@keyframes engine-hum {
+  0% { transform: translateY(0px); }
+  100% { transform: translateY(-1.5px); }
+}
+
+@keyframes highway-move {
+  0% { background-position: 0px 0px; }
+  100% { background-position: -30px 0px; }
+}
+
+@keyframes progress-stripe {
+  from { background-position: 0 0; }
+  to { background-position: 20px 0; }
+}
+

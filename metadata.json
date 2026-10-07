@@ -1,0 +1,8 @@
+{
+  "name": "DREAMERS",
+  "description": "KARIBU TUONGEE BIASHARA - Tanzania's premier multi-vendor marketplace.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

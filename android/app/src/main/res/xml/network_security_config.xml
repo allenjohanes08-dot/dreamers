@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<network-security-config>
+    <domain-config cleartextTrafficPermitted="false">
+        <domain includeSubdomains="true">ais-pre-owu2l4ecbh5v3duprblerd-413281753215.europe-west2.run.app</domain>
+        <domain includeSubdomains="true">ais-dev-owu2l4ecbh5v3duprblerd-413281753215.europe-west2.run.app</domain>
+        <domain includeSubdomains="true">firebaseapp.com</domain>
+        <domain includeSubdomains="true">googleapis.com</domain>
+        <domain includeSubdomains="true">gstatic.com</domain>
+    </domain-config>
+</network-security-config>

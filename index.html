@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script>
+      // Circular structure safety defense for JSON.stringify to protect against WebChannel/DOM/Maps recursion
+      (function() {
+        var origStringify = JSON.stringify;
+        JSON.stringify = function(value, replacer, space) {
+          try {
+            var seen = new WeakSet();
+            return origStringify.call(JSON, value, function(k, v) {
+              if (typeof v === 'object' && v !== null) {
+                if (seen.has(v)) return '[Circular]';
+                seen.add(v);
+              }
+              if (typeof replacer === 'function') {
+                return replacer.call(this, k, v);
+              }
+              return v;
+            }, space);
+          } catch (err) {
+            try {
+              return origStringify.call(JSON, String(value));
+            } catch (e) {
+              return '"[Unserializable]"';
+            }
+          }
+        };
+      })();
+    </script>
+    <title>DREAMERS | KARIBU TUONGEE BIASHARA</title>
+    <meta name="description" content="DREAMERS - KARIBU TUONGEE BIASHARA. Tanzania's premier multi-vendor marketplace." />
+    <meta property="og:title" content="DREAMERS | KARIBU TUONGEE BIASHARA" />
+    <meta property="og:description" content="DREAMERS - KARIBU TUONGEE BIASHARA. Tanzania's premier multi-vendor marketplace." />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="theme-color" content="#059669" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Dreamers" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+  </head>
+  <body>
+    <!-- Full screen loading overlay -->
+    <div id="loader-wrapper">
+      <div class="animation-container">
+        <!-- Custom Truck SVG -->
+        <svg class="delivery-truck" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 80">
+          <!-- Chassis / Wheels Background -->
+          <rect x="25" y="58" width="80" height="6" fill="#2d2d2d" rx="2" />
+          <!-- Cargo Box -->
+          <rect x="52" y="16" width="60" height="42" fill="#f0fdf4" stroke="#e0e0e0" stroke-width="1.5" rx="2" />
+          <line x1="110" y1="16" x2="110" y2="58" stroke="#d5d5d5" stroke-width="1" />
+          <!-- Truck Cab -->
+          <path d="M52,32 L36,32 C30,32 24,38 21,44 L20,58 L52,58 Z" fill="#f0fdf4" />
+          <!-- Front Grille & Bumper -->
+          <path d="M20,48 L17,49 C16,50 16,54 18,57 L20,58 Z" fill="#242424" />
+          <rect x="16" y="52" width="4" height="4" fill="#111111" rx="1" />
+          <!-- Windshield & Side Window -->
+          <path d="M26,43 L34,35 L48,35 L48,45 Z" fill="#4a5568" opacity="0.8" />
+          <path d="M25,44 L32,36 L35,36 L28,45 Z" fill="#718096" opacity="0.5" />
+          <!-- Front Wheel -->
+          <circle cx="35" cy="58" r="9" fill="#1a1a1a" />
+          <circle cx="35" cy="58" r="4" fill="#cccccc" />
+          <!-- Rear Wheel -->
+          <circle cx="90" cy="58" r="9" fill="#1a1a1a" />
+          <circle cx="90" cy="58" r="4" fill="#cccccc" />
+        </svg>
+
+        <!-- Moving Road Lines -->
+        <div class="road-line"></div>
+      </div>
+      <p class="loading-text">DELIVERING CONTENT...</p>
+
+      <!-- Synchronized Progress Bar -->
+      <div class="loader-progress-track">
+        <div id="loader-progress-fill" class="loader-progress-fill" style="width: 20%;"></div>
+      </div>
+      <div class="loader-status-row">
+        <span id="loader-status-detail" class="loader-status-detail">Loading modules...</span>
+        <span id="loader-progress-percent" class="loader-progress-percent">20%</span>
+      </div>
+    </div>
+
+    <div id="root"></div>
+    <script>
+      // Global App Loader Synchronization Bridge
+      window.__appLoader = {
+        currentProgress: 20,
+        setProgress: function(percent, detailText) {
+          const bounded = Math.min(100, Math.max(this.currentProgress, percent));
+          this.currentProgress = bounded;
+          const fill = document.getElementById('loader-progress-fill');
+          const percentEl = document.getElementById('loader-progress-percent');
+          const detailEl = document.getElementById('loader-status-detail');
+          if (fill) fill.style.width = bounded + '%';
+          if (percentEl) percentEl.textContent = Math.round(bounded) + '%';
+          if (detailEl && detailText) detailEl.textContent = detailText;
+        },
+        hide: function() {
+          this.setProgress(100, 'Marketplace Ready!');
+          setTimeout(function() {
+            const loader = document.getElementById('loader-wrapper');
+            if (loader) {
+              loader.classList.add('loader-hidden');
+              setTimeout(function() {
+                if (loader.parentNode) loader.parentNode.removeChild(loader);
+              }, 500);
+            }
+          }, 300);
+        }
+      };
+
+      // Progressively increment initial bundle bootstrap
+      window.addEventListener('DOMContentLoaded', function() {
+        if (window.__appLoader) {
+          window.__appLoader.setProgress(35, 'Initializing Dreamers runtime...');
+        }
+      });
+
+      // Safety timeout to ensure loader dismisses cleanly even if network is slow
+      setTimeout(function() {
+        if (window.__appLoader) {
+          window.__appLoader.hide();
+        }
+      }, 2500);
+    </script>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
+

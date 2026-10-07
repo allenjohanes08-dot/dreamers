@@ -1,0 +1,130 @@
+{
+  "entities": {
+    "giftCardRequest": {
+      "title": "GiftCardRequest",
+      "description": "Customer request for a gift card requiring admin approval.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "userId": { "type": "string", "description": "Requester Firebase UID" },
+        "userEmail": { "type": "string" },
+        "userName": { "type": "string" },
+        "amount": { "type": "number" },
+        "code": { "type": "string" },
+        "recipientName": { "type": "string" },
+        "recipientEmail": { "type": "string" },
+        "personalMessage": { "type": "string" },
+        "status": { "type": "string", "enum": ["PENDING", "APPROVED", "REJECTED", "COMPLETED"] },
+        "adminNote": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "amount", "status"]
+    },
+    "registryRequest": {
+      "title": "RegistryRequest",
+      "description": "Customer gift registry request requiring admin approval.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "userId": { "type": "string", "description": "Requester Firebase UID" },
+        "userEmail": { "type": "string" },
+        "userName": { "type": "string" },
+        "title": { "type": "string" },
+        "category": { "type": "string" },
+        "eventDate": { "type": "string" },
+        "deliveryAddress": { "type": "string" },
+        "description": { "type": "string" },
+        "targetAmount": { "type": "number" },
+        "status": { "type": "string", "enum": ["PENDING", "APPROVED", "REJECTED", "COMPLETED"] },
+        "adminNote": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "title", "status"]
+    },
+    "notification": {
+      "title": "Notification",
+      "description": "System or order notification for a user.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "description": "Target user UID" },
+        "title": { "type": "string", "maxLength": 100 },
+        "message": { "type": "string", "maxLength": 500 },
+        "type": { "type": "string", "enum": ["ORDER", "SYSTEM", "PROMO"] },
+        "read": { "type": "boolean" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "title", "message", "read", "createdAt"]
+    },
+    "userProfile": {
+      "title": "UserProfile",
+      "description": "User profile with role verification and permissions.",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "email": { "type": "string" },
+        "fullName": { "type": "string", "maxLength": 100 },
+        "phone": { "type": "string", "maxLength": 50 },
+        "requestedRole": { "type": "string", "enum": ["CUSTOMER", "SELLER", "LOGISTICS", "customer", "seller", "logistics", "logistic_officer"] },
+        "verifiedRole": { "type": "string", "enum": ["CUSTOMER", "SELLER", "LOGISTICS", "ADMIN", "customer", "seller", "logistics", "admin", "logistic_officer"] },
+        "roleVerificationStatus": { "type": "string", "enum": ["PENDING", "APPROVED", "VERIFIED", "REJECTED", "pending", "approved", "verified", "rejected"] },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "email", "verifiedRole"]
+    },
+    "eventInvitation": {
+      "title": "EventInvitation",
+      "description": "Cryptographically secure event invitation record.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "eventId": { "type": "number" },
+        "eventTitle": { "type": "string" },
+        "eventCategory": { "type": "string" },
+        "eventDate": { "type": "string" },
+        "startTime": { "type": "string" },
+        "endTime": { "type": "string" },
+        "venueName": { "type": "string" },
+        "deliveryAddress": { "type": "string" },
+        "eventInstructions": { "type": "string" },
+        "inviterId": { "type": "number" },
+        "inviterName": { "type": "string" },
+        "invitedUserId": { "type": "number" },
+        "invitedUserUid": { "type": "string" },
+        "invitedUserName": { "type": "string" },
+        "invitedUserEmail": { "type": "string" },
+        "invitationCode": { "type": "string" },
+        "verificationToken": { "type": "string" },
+        "status": { "type": "string", "enum": ["PENDING", "ACCEPTED", "DECLINED", "REVOKED"] },
+        "arrivalStatus": { "type": "string", "enum": ["PENDING", "ARRIVED"] },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["eventId", "invitationCode", "verificationToken", "invitedUserName", "status", "arrivalStatus"]
+    }
+  },
+  "firestore": {
+    "giftCardRequests/{requestId}": {
+      "schema": "giftCardRequest",
+      "description": "Customer gift card requests"
+    },
+    "registryRequests/{requestId}": {
+      "schema": "registryRequest",
+      "description": "Customer registry requests"
+    },
+    "notifications/{notificationId}": {
+      "schema": "notification",
+      "description": "User notifications"
+    },
+    "users/{userId}": {
+      "schema": "userProfile",
+      "description": "User profile documents with role controls"
+    },
+    "eventInvitations/{invitationId}": {
+      "schema": "eventInvitation",
+      "description": "Event invitations"
+    }
+  }
+}
